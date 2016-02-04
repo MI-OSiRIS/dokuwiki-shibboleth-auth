@@ -14,6 +14,12 @@ $conf = array(
      * auth plugin (auth.php)
      */
     
+    // use discovery service interface
+    'login_discovery_service' => false,
+
+    //show plain auth login too
+    'login_plain_auth' => false,
+
     // Rely on the Dokuwiki session
     'use_dokuwiki_session' => true,
     

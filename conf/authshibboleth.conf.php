@@ -13,6 +13,25 @@ $conf['plugin']['authshibboleth'] = array(
      */
 
     /*
+    * login_discovery_service 
+    *
+    * If set to true, show the Shibboleth embedded discovery controls.  Javascript and css for controls sourced from shibboleth-embedded-ds package.
+    * (https://wiki.shibboleth.net/confluence/display/EDS10/2.+Installation)
+    */
+
+    // 'login_discovery_service' => false,
+
+    /*
+    * login_plain_auth
+    *
+    * If set to true, enable a plaintext authentication dialog on the login page for local (plain) auth.  It will
+    * be displayed along with the DS selector or a simple "Login with Shibboleth" button if not using DS
+    *
+    */
+
+    // 'login_plain_auth' => false,
+
+    /*
      * use_dokuwiki_session
      * 
      * If set to true, once the user is authenticated, the DokuWiki session will be used to persist the user's
