@@ -1,3 +1,7 @@
+## v0.7.3
+
+* add embedded discovery interface to dokuwiki login output (replacing login form)
+
 ## v0.7.2
 
 * correct typo in function name getUserDisplayNameFromTpl -> retrieveUserDisplayNameFromTpl (thanks to micromeers)

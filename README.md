@@ -54,4 +54,19 @@ It's better to use `local.protected.php` instead of `local.php`, because `local.
 
 The `authshibboleth.conf.php` file contains all available directives, set to their default values and commented out. If you need to change a directive, just uncomment it and change its value.
 
- 
+## Embedded discovery interface
+
+Assuming you have setup your SP already, to enable an embedded discovery interface set the following in authshibboleth.conf.php:
+
+	'login_discovery_service' => true,
+
+In DOKUWIKI_HOME/lib/plugins/authshibboleth/idpselect_config.js configure the default return url to your SP:
+	
+	this.defaultReturn = "https://www.example.org/Shibboleth.sso/Login?SAMLDS=1";
+
+Links in the embedded interface will be modified to pass 'target' param to the selected identity provider preserving any URL args for page
+
+The .js and .css for the embedded interface come from the shibboleth-embedded-ds package.  More info:  https://wiki.shibboleth.net/confluence/display/EDS10/2.+Installation
+
+If the embedded service is not enabled, then instead a link "Login with Shibboleth" will be displayed.  This will direct to service provider as configured in authshibboleth.conf.php and discovery service as configured in shibboleth.
+
