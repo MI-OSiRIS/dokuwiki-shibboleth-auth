@@ -11,9 +11,10 @@ function IdPSelectUIParms(){
     this.defaultLogoWidth = 1;
     this.defaultLogoHeight = 1 ;
     // this.defaultReturn = null;       // If non null, then the default place to send users who are not
-                                     // Approaching via the Discovery Protocol.
-					// this must be set for embedded DS to work
-    this.defaultReturn = "https://www.example.com/Shibboleth.sso/Login?SAMLDS=1";
+                                     // Approaching via the Discovery Protocol for example
+    this.defaultReturn = "https://wiki.osris.org/Shibboleth.sso/Login?SAMLDS=1";
+    //this.defaultReturn = "https://um-wiki.osris.org/Shibboleth.sso/Login?SAMLDS=1";
+    //&target=https://um-wiki.osris.org";
     this.ignoreURLParams = true;
     //this.defaultReturnIDParam = "";
     this.helpURL = 'https://spaces.internet2.edu/display/ShibInstallFest/Intro+to+Embedded+Discovery+Service';

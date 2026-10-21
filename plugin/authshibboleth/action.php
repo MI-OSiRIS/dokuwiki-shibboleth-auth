@@ -6,7 +6,7 @@
  * Intercepts the 'login' action and redirects the user to the Shibboleth Session Initiator Handler
  * instead of showing the login form.
  * 
- * @author  Ivan Novakov http://novakov.cz/
+ * @author  Ivan Novakov http://novakov.cz/, this fork by Ben Meekhof
  * @license http://debug.cz/license/bsd-3-clause BSD 3 Clause 
  * @link https://github.com/ivan-novakov/dokuwiki-shibboleth-auth
  */
@@ -22,7 +22,6 @@ if (! defined('DOKU_TAB'))
 if (! defined('DOKU_PLUGIN'))
     define('DOKU_PLUGIN', DOKU_INC . 'lib/plugins/');
 
-require_once DOKU_PLUGIN . 'action.php';
 
 
 class action_plugin_authshibboleth extends DokuWiki_Action_Plugin
@@ -41,7 +40,7 @@ class action_plugin_authshibboleth extends DokuWiki_Action_Plugin
     const CONF_LOGIN_PLAIN = 'login_plain_auth';
 
 
-    public function register(Doku_Event_Handler &$controller)
+    public function register(\dokuwiki\Extension\EventHandler $controller)
     {
     	if ($this->getConf(self::CONF_LOGIN_DS) === true) {
     		$controller->register_hook('TPL_METAHEADER_OUTPUT', 'BEFORE', $this, '_hookcss');
@@ -49,11 +48,11 @@ class action_plugin_authshibboleth extends DokuWiki_Action_Plugin
     	    $controller->register_hook('ACTION_ACT_PREPROCESS', 'BEFORE', $this, 'redirectToLoginHandler');
     	}
 
-        $controller->register_hook('HTML_LOGINFORM_OUTPUT', 'BEFORE', $this, 'handleLoginForm');
+        $controller->register_hook('FORM_LOGIN_OUTPUT', 'BEFORE', $this, 'handleLoginForm');
     }
 
 
-    public function _hookcss(Doku_Event $event, $param) {
+    public function _hookcss(\dokuwiki\Extension\Event $event, $param) {
         // Adding a stylesheet
         $event->data["link"][] = array (
         "type" => "text/css",
@@ -76,7 +75,7 @@ class action_plugin_authshibboleth extends DokuWiki_Action_Plugin
     }
 
 
-    public function handleLoginForm(Doku_Event &$event, $param) {
+    public function handleLoginForm(\dokuwiki\Extension\Event $event, $param) {
 
         if ($this->getConf(self::CONF_LOGIN_DS) === true) {
 
@@ -96,7 +95,7 @@ class action_plugin_authshibboleth extends DokuWiki_Action_Plugin
         		idpPref = idpPrefTile.getElementsByTagName("a"); 
                     	for(var i=0; i<idpPref.length; i++) {
                         	ohref = idpPref[i].href;
-        	                idpPref[i].href = ohref + "&target=' . $target . '";
+        	                idpPref[i].href = ohref + "&target=" + encodeURIComponent("' . $target . '");
         		}
                 }
                 idpEntry.firstElementChild.insertAdjacentHTML("beforeend","<input value=\"' . $target . '\" name=\"target\" type=\"hidden\">");
@@ -112,10 +111,13 @@ class action_plugin_authshibboleth extends DokuWiki_Action_Plugin
                 $msg = '<p><a href="' . $this->generateLoginHandlerLink() . '">Log In with Shibboleth</a></p>';
             }
             
-             // replace login form with my (non)form
-            $form = new Doku_Form(array('id' => 'dw__login'));
-            $form->addElement($msg);
-            $event->data = $form;
+             // replace login form with my (non)form. FORM_LOGIN_OUTPUT passes the
+             // live dokuwiki\Form\Form (Doku_Form is gone), so empty it in place.
+            $form = $event->data;
+            while ($form->elementCount() > 0) {
+                $form->removeElement(0);
+            }
+            $form->addHTML($msg);
             // so it would be nice to display the regular form and enable both plain and shib login but I'm leaving that for another day
             // displaying the form works fine but some changes are needed to do the plain auth on login
             //$event->data->addElement($msg);
@@ -138,7 +140,7 @@ class action_plugin_authshibboleth extends DokuWiki_Action_Plugin
 
     protected function mkTargetUrl() {
         $pageURL = 'http';
-        if ($_SERVER["HTTPS"] == "on") {$pageURL .= "s";}
+        if (($_SERVER["HTTPS"] ?? '') == "on") {$pageURL .= "s";}
         $pageURL .= "://";
         if ($_SERVER["SERVER_PORT"] != "80" && $_SERVER["SERVER_PORT"] != "443") {
             $pageURL .= $_SERVER["SERVER_NAME"].":".$_SERVER["SERVER_PORT"];
@@ -149,7 +151,8 @@ class action_plugin_authshibboleth extends DokuWiki_Action_Plugin
         }
 
         $urlParts = parse_url($_SERVER["REQUEST_URI"]);
-        parse_str($urlParts['query'], $query);
+        parse_str($urlParts['query'] ?? '', $query);
+        unset($query['do'], $query['sectok']);
         $qs = $this->mkQueryString($query);
         return $pageURL . $urlParts['path'] . $qs;
     }
@@ -201,6 +204,6 @@ class action_plugin_authshibboleth extends DokuWiki_Action_Plugin
             $queryParams[] = sprintf("%s=%s", $key, urlencode($value));
         }
         
-        return '?' . implode('amp;', $queryParams);
+        return '?' . implode('&', $queryParams);
     }
 }

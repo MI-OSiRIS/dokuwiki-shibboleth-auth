@@ -84,6 +84,10 @@ class auth_plugin_authshibboleth extends DokuWiki_Auth_Plugin
      */
     protected $userInfo = array();
 
+    // Declared for PHP 8 (were dynamic properties). users is loaded lazily.
+    protected $users = null;
+    protected $_pregsplit_safe = true;
+
 
     /**
      * Constructor.
@@ -289,12 +293,12 @@ class auth_plugin_authshibboleth extends DokuWiki_Auth_Plugin
      * {@inheritdoc}
      * @see DokuWiki_Auth_Plugin::trustExternal()
      */
-    public function trustExternal()
+    public function trustExternal($user = null, $pass = null, $sticky = false)
     {
         $this->debug('Checking for DokuWiki session...');
         if ($this->getConf(self::CONF_USE_DOKUWIKI_SESSION) && ($userInfo = $this->loadUserInfoFromSession()) !== null) {
             $this->log('Loaded user from DokuWiki session');
-            return;
+            return true;
         }
         
         $sessionVarName = $this->getConf(self::CONF_VAR_SHIB_SESSION_ID);
