@@ -6,7 +6,7 @@
  * Intercepts the 'login' action and redirects the user to the Shibboleth Session Initiator Handler
  * instead of showing the login form.
  * 
- * @author  Ivan Novakov http://novakov.cz/
+ * @author  Ivan Novakov http://novakov.cz/, this fork by Ben Meekhof
  * @license http://debug.cz/license/bsd-3-clause BSD 3 Clause 
  * @link https://github.com/ivan-novakov/dokuwiki-shibboleth-auth
  */
